@@ -274,3 +274,6 @@ body {
 footer{
   background: linear-gradient(135deg, #4E342E,#6D4C41,#4E342E);
 }
+.fa-utensils{
+  color: var(--primary-color);
+}
