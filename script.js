@@ -1,3 +1,62 @@
+
+class CardManager {
+  constructor() {
+    this.cards = this.loadCards();
+    this.currentUser = this.getCurrentUser();
+  }
+
+  loadCards() {
+    const cards = localStorage.getItem("restaurant-cards");
+    return cards ? JSON.parse(cards) : [];
+  }
+
+  saveCards() {
+    localStorage.setItem("restaurant-cards", JSON.stringify(this.cards));
+  }
+
+  getCurrentUser() {
+    const user = localStorage.getItem("currentUser");
+    return user ? JSON.parse(user) : null;
+  }
+}
+function addCard(ProductElement) {
+  const productCard = (productCard = ProductElement.closest(".product-card"));
+  const productName =
+    productCard.querySelector(".product-title").textContent?.replace("$", "") ||
+    "0";
+  const productPrice =
+    productCard.querySelector(".product-price").textContent?.replace("$", "") ||
+    "0";
+  const productCategory =
+    productCard
+      .querySelector(".product-category")
+      .textContent?.trim()
+      .toLowerCase() || "appetizers";
+  const productImageStyle =
+    productCard.querySelector(".product-image").style.backgroundImage || "";
+
+  let productImage = "";
+  if (productImageStyle) {
+    const urlMatch = productImageStyle.match(/url\('([^']+)'/);
+    productImage = urlMatch ? urlMatch[1] : "";
+  }
+
+  const productId = Date.now() + Math.random().toString(36).substring(2, 9);
+
+  const product = {
+    id: productId,
+    name: productName,
+    price: productPrice,
+    category: productCategory,
+    image: productImage,
+  };
+}
+
+
+
+
+
+
 function initializeCategoryFilters() {
   const filterButtons = document.querySelectorAll(".filter-btn");
   const productItems = document.querySelectorAll(".product-item");
