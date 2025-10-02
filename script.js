@@ -5,12 +5,12 @@ class CardManager {
     this.currentUser = this.getCurrentUser();
   }
 
-  loadCards() {
+   loadCardItems() {
     const cards = localStorage.getItem("restaurant-cards");
     return cards ? JSON.parse(cards) : [];
   }
 
-  saveCards() {
+  saveCardItems() {
     localStorage.setItem("restaurant-cards", JSON.stringify(this.cards));
   }
 
@@ -18,7 +18,102 @@ class CardManager {
     const user = localStorage.getItem("currentUser");
     return user ? JSON.parse(user) : null;
   }
+
+  addItem(product) {
+    const existingItem = this.items.find((item) => item.id === product.id);
+    if (existingItem) {
+      existingItem.quantity += 1;
+    } else {
+      this.items.push({
+        id: product.id,
+        name: product.name,
+        price: product.price,
+        quantity: 1,
+        image: product.image,
+        category: product.category,
+        addedAt: new Date().toISOString(),
+      });
+    }
+    this.saveCardItems();
+    this.showAddToCartAnimation(product);
+    return true;
+  }
+
+  showCartNotification(
+    message,
+    type = "success",
+    icon = "fas fa-shopping-cart"
+  ) {
+    const notification = document.createElement("div");
+    notification.className = `card-notification card-notification-${type} alert-dismissible fade show`;
+    let iconClass;
+    switch (type) {
+      case "success":
+        iconClass = "fas fa-plus-circle";
+        break;
+      case "danger":
+        iconClass = "fas fa-trash-alt";
+        break;
+      case "warning":
+        iconClass = "fas fa-minus-circle";
+        break;
+      case "info":
+        iconClass = "fas fa-info-circle";
+        break;
+      default:
+        iconClass = "fas fa-shopping-cart";
+        break;
+    }
+    notification.innerHTML = `
+    <div class="d-flex align-items-center">
+      <i class="${iconClass} me-2"></i>
+      <span>${message}</span>
+    </div>
+    
+    
+    `;
+
+    const existingNotification = document.querySelector(".card-notification");
+    const topPosition = 100 + existingNotification.length * 70;
+    notification.style.cssText = `
+    position: fixed;
+    top: ${topPosition}px;
+    right: 20px;
+    z-index: 1000;
+    animation: fadeIn 0.3s ease-in-out;
+    width: 300px;
+    background: #fff;
+    border-radius: 5px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    padding: 15px;
+    margin-bottom: 10px;
+    border: 1px solid #e0e0e0;
+    color: #333;
+    font-size: 14px;
+    `;
+    document.body.appendChild(notification);
+
+    setTimeout(() => {
+      notification.style.transform = "translateY(100%)";
+      setTimeout(() => {
+        if (document.body.contains(notification)) {
+          document.body.removeChildren(notification);
+        }
+      }, 3000);
+    }, 3000);
+  }
+
+  showAddToCartAnimation(product) {
+    this.showCartNotification(
+      `${product.name} added to cart`,
+
+      "success",
+      "fas fa-shopping-cart"
+    );
+  }
 }
+const cardManager = new CardManager();
+
 function addCard(ProductElement) {
   const productCard = (productCard = ProductElement.closest(".product-card"));
   const productName =
@@ -50,6 +145,7 @@ function addCard(ProductElement) {
     category: productCategory,
     image: productImage,
   };
+  cardManager.addItem(product);
 }
 
 
